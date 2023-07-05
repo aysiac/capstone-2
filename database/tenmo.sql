@@ -53,6 +53,22 @@ CREATE TABLE status(
 	status_id serial PRIMARY KEY,
 	status_name varchar(50));
 	
+ALTER TABLE transaction Rename TO transfer
 
+ALTER TABLE transfer RENAME transaction_id TO transfer_id
+
+ALTER TABLE transfer RENAME transaction_date TO transfer_date;
+ALTER TABLE transfer RENAME transaction_amount TO transfer_amount;
+
+ALTER TABLE transfer ADD COLUMN status_id int 
+ALTER TABLE transfer ADD CONSTRAINT fk_transfer_status FOREIGN KEY (status_id) REFERENCES status (status_id)
+
+ALTER TABLE transfer ADD COLUMN transfer_type_id int
+ALTER TABLE transfer ADD CONSTRAINT fk_transfer_type FOREIGN KEY (transfer_type_id) REFERENCES transfer_type (transfer_type_id)
+
+ALTER TABLE transfer DROP column status
+
+ALTER TABLE transfer ADD COLUMN created_date Date;
+ALTER TABLE transfer ADD COLUMN created_by int;
 	
 COMMIT;

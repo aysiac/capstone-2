@@ -33,5 +33,26 @@ CREATE TABLE account (
 	CONSTRAINT FK_account_tenmo_user FOREIGN KEY (user_id) REFERENCES tenmo_user (user_id)
 );
 
+CREATE TABLE transaction(
+	transaction_id serial NOT NULL,
+	from_user int NOT NULL,
+	to_user int NOT NULL,
+	transaction_date date NOT NULL,
+	transaction_amount decimal(13,2) NOT NULL,
+	status varchar(50) NOT NULL,
+	CONSTRAINT PK_transaction PRIMARY KEY (transaction_id),
+	CONSTRAINT FK_trasaction_from_user FOREIGN KEY (from_user) REFERENCES tenmo_user (user_id),
+	CONSTRAINT FK_trasaction_to_user FOREIGN KEY (to_user) REFERENCES tenmo_user (user_id));
+	
+	
+CREATE TABLE transfer_type(
+	transfer_type_id serial PRIMARY KEY,
+	transfer_name varchar(50));
+		
+CREATE TABLE status(
+	status_id serial PRIMARY KEY,
+	status_name varchar(50));
+	
 
+	
 COMMIT;

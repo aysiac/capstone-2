@@ -22,25 +22,32 @@ public class JdbcTransferDao  implements TransferDao{
     public double getBalance(String username){
         AccountBalanceDTO balanceDTO = new AccountBalanceDTO();
         SqlRowSet results;
-
-        double balance=0.00;
         String query = "SELECT balance FROM account WHERE user_id = " +
                 "(SELECT user_id FROM tenmo_user WHERE username =?);";
         try {
            //balanceDTO = jdbcTemplate.queryForObject(query,AccountBalanceDTO.class,username);
             results = jdbcTemplate.queryForRowSet(query, username);
             if(results.next()){
-
-                balance = results.getDouble("balance");
+                balanceDTO.setBalance(results.getDouble("balance"));
             }
         }catch (DataAccessException e){
 
         }
         return balanceDTO.getBalance();
     }
-    public List<User> getListOfUsers(){
+    public List<User> getListOfUsers(String username){
         List<User> userList = new ArrayList<>();
-        //TODO
+        String query = "SELECT user_id,username FROM tenmo_user WHERE username<>?;";
+        SqlRowSet results ;
+        try{
+            results = jdbcTemplate.queryForRowSet(query, username);
+            while (results.next()){
+               userList.add(mapToUser(results));
+            }
+        }catch (DataAccessException ex){
+            //TODO
+        }
+
         return userList;
     }
     public void makeTransfer(Transfer transfer){
@@ -55,6 +62,12 @@ public class JdbcTransferDao  implements TransferDao{
         Transfer transfer = null;
         //TODO
         return transfer;
+    }
+    private User mapToUser(SqlRowSet rowSet){
+        User user = new User();
+        user.setId(rowSet.getLong("user_id"));
+        user.setUsername(rowSet.getString("username"));
+        return user;
     }
     
 }

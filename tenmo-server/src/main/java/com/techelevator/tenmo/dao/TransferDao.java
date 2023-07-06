@@ -9,7 +9,7 @@ import java.util.List;
 public interface TransferDao {
 
     public double getBalance(String username);
-    public List<User> getListOfUsers();
+    public List<User> getListOfUsers(String username);
     public void makeTransfer(Transfer transfer);
     public List<Transfer> getListOfTransfers(String username);
     public Transfer getTransferDetails(String transferId);

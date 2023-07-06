@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS tenmo_user, account;
+DROP TABLE IF EXISTS tenmo_user, account, transfer, transfer_type, status;
 
 DROP SEQUENCE IF EXISTS seq_user_id, seq_account_id;
 
@@ -33,42 +33,27 @@ CREATE TABLE account (
 	CONSTRAINT FK_account_tenmo_user FOREIGN KEY (user_id) REFERENCES tenmo_user (user_id)
 );
 
-CREATE TABLE transaction(
-	transaction_id serial NOT NULL,
-	from_user int NOT NULL,
-	to_user int NOT NULL,
-	transaction_date date NOT NULL,
-	transaction_amount decimal(13,2) NOT NULL,
-	status varchar(50) NOT NULL,
-	CONSTRAINT PK_transaction PRIMARY KEY (transaction_id),
-	CONSTRAINT FK_trasaction_from_user FOREIGN KEY (from_user) REFERENCES tenmo_user (user_id),
-	CONSTRAINT FK_trasaction_to_user FOREIGN KEY (to_user) REFERENCES tenmo_user (user_id));
-	
-	
 CREATE TABLE transfer_type(
 	transfer_type_id serial PRIMARY KEY,
-	transfer_name varchar(50));
+	transfer_type_name varchar(50));
 		
 CREATE TABLE status(
 	status_id serial PRIMARY KEY,
 	status_name varchar(50));
 	
-ALTER TABLE transaction Rename TO transfer
+CREATE TABLE transfer(
+	transfer_id serial NOT NULL,
+	from_user int NOT NULL,
+	to_user int NOT NULL,
+	transfer_amount decimal(13,2) NOT NULL,
+	status_id int NOT NULL,
+	transfer_type_id int NOT NULL,
+	CONSTRAINT pk_transfer PRIMARY KEY (transfer_id),
+	CONSTRAINT fk_transfer_from_user FOREIGN KEY (from_user) REFERENCES tenmo_user(user_id),
+	CONSTRAINT fk_transfer_to_user FOREIGN KEY (to_user) REFERENCES tenmo_user(user_id),
+	CONSTRAINT fk_transfer_status FOREIGN KEY (status_id) REFERENCES status (status_id),
+	CONSTRAINT fk_transfer_type FOREIGN KEY (transfer_type_id) REFERENCES transfer_type (transfer_type_id)
+	);
 
-ALTER TABLE transfer RENAME transaction_id TO transfer_id
-
-ALTER TABLE transfer RENAME transaction_date TO transfer_date;
-ALTER TABLE transfer RENAME transaction_amount TO transfer_amount;
-
-ALTER TABLE transfer ADD COLUMN status_id int 
-ALTER TABLE transfer ADD CONSTRAINT fk_transfer_status FOREIGN KEY (status_id) REFERENCES status (status_id)
-
-ALTER TABLE transfer ADD COLUMN transfer_type_id int
-ALTER TABLE transfer ADD CONSTRAINT fk_transfer_type FOREIGN KEY (transfer_type_id) REFERENCES transfer_type (transfer_type_id)
-
-ALTER TABLE transfer DROP column status
-
-ALTER TABLE transfer ADD COLUMN created_date Date;
-ALTER TABLE transfer ADD COLUMN created_by int;
 	
 COMMIT;

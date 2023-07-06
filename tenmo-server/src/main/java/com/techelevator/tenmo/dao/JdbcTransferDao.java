@@ -2,6 +2,7 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
@@ -11,9 +12,14 @@ public class JdbcTransferDao  implements TransferDao{
     JdbcTemplate jdbcTemplate = new JdbcTemplate();
     public double getBalance(String username){
         double balance=0.00;
+        
         String query = "SELECT balance FROM account WHERE user_id = " +
                 "(SELECT user_id FROM tenmo_user WHERE username ILIKE ?; );";
-        
+        try {
+            balance = jdbcTemplate.queryForObject(query, double.class, username);
+        }catch (DataAccessException e){
+           balance = 0;
+        }
         return balance;
     }
     public List<User> getListOfUsers(){
@@ -34,4 +40,6 @@ public class JdbcTransferDao  implements TransferDao{
         //TODO
         return transfer;
     }
+    
+    
 }

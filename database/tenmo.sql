@@ -37,23 +37,30 @@ CREATE TABLE transfer_type(
 	transfer_type_id serial PRIMARY KEY,
 	transfer_type_name varchar(50));
 		
-CREATE TABLE status(
-	status_id serial PRIMARY KEY,
-	status_name varchar(50));
+CREATE TABLE transfer_status(
+	transfer_status_id serial PRIMARY KEY,
+	transfer_status_name varchar(50));
 	
 CREATE TABLE transfer(
 	transfer_id serial NOT NULL,
-	from_user int NOT NULL,
-	to_user int NOT NULL,
-	transfer_amount decimal(13,2) NOT NULL,
-	status_id int NOT NULL,
+	transfer_status_id int NOT NULL,
 	transfer_type_id int NOT NULL,
+	from_account int NOT NULL,
+	to_account int NOT NULL,
+	transfer_amount decimal(13,2) NOT NULL,
+	
 	CONSTRAINT pk_transfer PRIMARY KEY (transfer_id),
-	CONSTRAINT fk_transfer_from_user FOREIGN KEY (from_user) REFERENCES tenmo_user(user_id),
-	CONSTRAINT fk_transfer_to_user FOREIGN KEY (to_user) REFERENCES tenmo_user(user_id),
-	CONSTRAINT fk_transfer_status FOREIGN KEY (status_id) REFERENCES status (status_id),
-	CONSTRAINT fk_transfer_type FOREIGN KEY (transfer_type_id) REFERENCES transfer_type (transfer_type_id)
+	CONSTRAINT fk_transfer_status FOREIGN KEY (transfer_status_id) REFERENCES transfer_status (transfer_status_id),
+	CONSTRAINT fk_transfer_type FOREIGN KEY (transfer_type_id) REFERENCES transfer_type (transfer_type_id),
+	CONSTRAINT fk_transfer_from_account FOREIGN KEY (from_account) REFERENCES account(account_id),
+	CONSTRAINT fk_transfer_to_account FOREIGN KEY (to_account) REFERENCES account(account_id)
+	
 	);
 
+INSERT INTO transfer_status(transfer_status_name) 
+values ('Approved'),('Pending'),('Rejected');
+
+INSERT INTO transfer_type(transfer_type_name)
+VALUES('Sent'),('Requested');
 	
 COMMIT;

@@ -2,11 +2,11 @@ package com.techelevator.tenmo.model;
 
 public class Transfer {
     private int transferId;
-    private int fromUser;
-    private int toUser;
+    private int fromAccount;
+    private int toAccount;
     private double transferAmount;
-    private String status;
-    private String transferType;
+    private int transferStatusId;
+    private int transferTypeId;
 
     public int getTransferId() {
         return transferId;
@@ -16,20 +16,20 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public int getFromUser() {
-        return fromUser;
+    public int getFromAccount() {
+        return fromAccount;
     }
 
-    public void setFromUser(int fromUser) {
-        this.fromUser = fromUser;
+    public void setFromAccount(int fromAccount) {
+        this.fromAccount = fromAccount;
     }
 
-    public int getToUser() {
-        return toUser;
+    public int getToAccount() {
+        return toAccount;
     }
 
-    public void setToUser(int toUser) {
-        this.toUser = toUser;
+    public void setToAccount(int toAccount) {
+        this.toAccount = toAccount;
     }
 
     public double getTransferAmount() {
@@ -40,28 +40,31 @@ public class Transfer {
         this.transferAmount = transferAmount;
     }
 
-    public String getStatus() {
-        return status;
+    public int getTransferStatusId() {
+        return transferStatusId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTransferStatusId(int transferStatusId) {
+        this.transferStatusId = transferStatusId;
     }
 
-    public String getTransferType() {
-        return transferType;
+    public int getTransferTypeId() {
+        return transferTypeId;
     }
 
-    public void setTransferType(String transferType) {
-        this.transferType = transferType;
+    public void setTransferTypeId(int transferTypeId) {
+        this.transferTypeId = transferTypeId;
     }
 
-    public Transfer(int transferId, int fromUser, int toUser, double transferAmount, String status, String transferType) {
+    public Transfer() {
+    }
+
+    public Transfer(int transferId, int fromAccount, int toAccount, double transferAmount, int transferStatus, int transferType) {
         this.transferId = transferId;
-        this.fromUser = fromUser;
-        this.toUser = toUser;
+        this.fromAccount = fromAccount;
+        this.toAccount = toAccount;
         this.transferAmount = transferAmount;
-        this.status = status;
-        this.transferType = transferType;
+        this.transferStatusId = transferStatus;
+        this.transferTypeId = transferType;
     }
 }

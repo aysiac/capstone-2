@@ -58,7 +58,7 @@ public class TransferController {
     }
 @GetMapping("/list/{username}")
     public List<Transfer> getTransferList (@PathVariable String username){
-        List <Transfer> transferList = transferDao.getListOfTransfers(username);
+        List<Transfer> transferList = transferDao.getListOfTransfers(username);
         return transferList;
     }
 }

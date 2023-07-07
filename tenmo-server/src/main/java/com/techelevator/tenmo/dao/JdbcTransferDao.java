@@ -78,19 +78,19 @@ public class JdbcTransferDao  implements TransferDao{
     }
     public List<Transfer> getListOfTransfers(String username){
         List<Transfer> transferList = new ArrayList<>();
-        String sql = "SELECT transfer_id, transfer_status_id, transfer_type, from_account, to_account, transfer_amount " +
-                "FROM transfer WHERE from_account = (SELECT account_id FROM account WHERE user_id = (SELECT user_id FROM tenmo_user WHERE username =?);";
-
+        String sql = "SELECT transfer_id, transfer_status_id, transfer_type_id, from_account, to_account, transfer_amount FROM transfer " +
+                "WHERE from_account = (SELECT account_id FROM account WHERE user_id = " +
+                "(SELECT user_id FROM tenmo_user WHERE username =?));";
         try{
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
             while (results.next()){
-                Transfer transfer = mapToTransfer (results);
+                Transfer transfer = mapToTransfer(results);
                 transferList.add(transfer);
             }
         } catch (DataAccessException e){
-
+            //TODO  
         }
-        //TODO
+        
         return transferList;
     }
     public Transfer getTransferDetails(String transferId){
@@ -131,9 +131,10 @@ public class JdbcTransferDao  implements TransferDao{
         Transfer transfer = new Transfer();
         transfer.setTransferId(rowSet.getInt("transfer_id"));
         transfer.setTransferStatusId(rowSet.getInt("transfer_status_id"));
+        transfer.setTransferTypeId(rowSet.getInt("transfer_type_id"));
         transfer.setFromAccount(rowSet.getInt("from_account"));
         transfer.setToAccount(rowSet.getInt("to_account"));
-        transfer.setTransferAmount(rowSet.getInt("transfer_amount"));
+        transfer.setTransferAmount(rowSet.getDouble("transfer_amount"));
 
         return transfer;
     }

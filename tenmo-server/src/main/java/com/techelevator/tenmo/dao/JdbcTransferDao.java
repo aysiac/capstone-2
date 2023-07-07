@@ -78,6 +78,18 @@ public class JdbcTransferDao  implements TransferDao{
     }
     public List<Transfer> getListOfTransfers(String username){
         List<Transfer> transferList = new ArrayList<>();
+        String sql = "SELECT transfer_id, transfer_status_id, transfer_type, from_account, to_account, transfer_amount " +
+                "FROM transfer WHERE from_account = (SELECT account_id FROM account WHERE user_id = (SELECT user_id FROM tenmo_user WHERE username =?);";
+
+        try{
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+            while (results.next()){
+                Transfer transfer = mapToTransfer (results);
+                transferList.add(transfer);
+            }
+        } catch (DataAccessException e){
+
+        }
         //TODO
         return transferList;
     }
@@ -112,6 +124,17 @@ public class JdbcTransferDao  implements TransferDao{
         user.setId(rowSet.getLong("user_id"));
         user.setUsername(rowSet.getString("username"));
         return user;
+
     }
-    
+
+    private Transfer mapToTransfer(SqlRowSet rowSet){
+        Transfer transfer = new Transfer();
+        transfer.setTransferId(rowSet.getInt("transfer_id"));
+        transfer.setTransferStatusId(rowSet.getInt("transfer_status_id"));
+        transfer.setFromAccount(rowSet.getInt("from_account"));
+        transfer.setToAccount(rowSet.getInt("to_account"));
+        transfer.setTransferAmount(rowSet.getInt("transfer_amount"));
+
+        return transfer;
+    }
 }

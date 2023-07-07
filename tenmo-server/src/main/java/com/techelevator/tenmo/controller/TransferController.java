@@ -5,6 +5,7 @@ import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.model.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -54,5 +55,10 @@ public class TransferController {
             newTransfer.setTransferTypeId(transferTypeId);
             transferDao.createTransfer(newTransfer);
         }
+    }
+@GetMapping("/list/{username}")
+    public List<Transfer> getTransferList (@PathVariable String username){
+        List <Transfer> transferList = transferDao.getListOfTransfers(username);
+        return transferList;
     }
 }

@@ -2,63 +2,81 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
+@PreAuthorize("isAuthenticated()")
 @RestController
-@RequestMapping("/transfer")
+//@RequestMapping("/transfer")
 public class TransferController {
     private TransferDao transferDao;
     private AccountDao accountDao;
+    private UserDao userDao;
 
-    public TransferController(TransferDao transferDao, AccountDao accountDao) {
+    public TransferController(TransferDao transferDao, AccountDao accountDao, UserDao userDao) {
         this.transferDao = transferDao;
         this.accountDao = accountDao;
+        this.userDao = userDao;
     }
 
-    @GetMapping("/balance/{username}")
-    public AccountBalanceDTO getBalance(@PathVariable String username) {
-        AccountBalanceDTO balance = transferDao.getBalance(username);
+    @GetMapping("/user/balance")
+    public AccountBalanceDTO getBalance(Principal principal) {
+        AccountBalanceDTO balance = transferDao.getBalance(principal.getName());
         return balance;
     }
 
-    @GetMapping("/{username}")
-    public List<User> getListOfUsers(@PathVariable String username) {
-        List<User> userList = transferDao.getListOfUsers(username);
+    @GetMapping("/view-users")
+    public List<User> getListOfUsers(Principal principal) {
+        List<User> userList = transferDao.getListOfUsers(principal.getName());
         return userList;
     }
 
-    @PostMapping("/start")
-    public void makeTransfer(@RequestBody TransferDTO transferDTO) {
+    @PostMapping("/send-money")
+    public Transfer makeTransfer(@Valid @RequestBody TransferDTO transferDTO, Principal principal) {
         boolean isTransferSuccess;
-        Transfer newTransfer = new Transfer() ;
-        Account fromAccount = accountDao.getAccountByUserName(transferDTO.getFromUserName());
-        Account toAccount = accountDao.getAccountByUserName(transferDTO.getToUserName());
-        if (transferDTO.getAmount() < fromAccount.getBalance()) {
-            transferDao.makeTransfer(fromAccount.getAccountId(), toAccount.getAccountId(), transferDTO.getAmount());
+        Transfer newTransfer = null;
+        Account fromAccount = accountDao.getAccountByUserId(transferDTO.getFromUserId());
+        Account toAccount = accountDao.getAccountByUserId(transferDTO.getToUserId());
+        int loggedInUserId = userDao.findIdByUsername(principal.getName());
+        //Check if the logged in user is making the transfer
+        if (transferDTO.getFromUserId() == loggedInUserId) {
+            if (transferDTO.getAmount() < fromAccount.getBalance()) {
+                transferDao.makeTransfer(fromAccount.getAccountId(), toAccount.getAccountId(), transferDTO.getAmount());
+                isTransferSuccess = true;
+            } else {
+                isTransferSuccess = false;
+            }
+            if (isTransferSuccess) {
+                int statusId = transferDao.getStatusByName("Approved");
+                int transferTypeId = transferDao.getTransferType("Sent");
+                Transfer transfer = new Transfer();
+                transfer.setFromAccount(fromAccount.getAccountId());
+                transfer.setToAccount(toAccount.getAccountId());
+                transfer.setTransferAmount(transferDTO.getAmount());
+                transfer.setTransferStatusId(statusId);
+                transfer.setTransferTypeId(transferTypeId);
 
-            isTransferSuccess = true;
-
-        } else {
-            isTransferSuccess = false;
+                newTransfer = transferDao.createTransfer(transfer);
+            }
         }
-        if(isTransferSuccess){
-            int statusId =  transferDao.getStatusByName("Approved");
-            int transferTypeId = transferDao.getTransferType("Sent");
-            newTransfer.setFromAccount(fromAccount.getAccountId());
-            newTransfer.setToAccount(toAccount.getAccountId());
-            newTransfer.setTransferAmount(transferDTO.getAmount());
-            newTransfer.setTransferStatusId(statusId);
-            newTransfer.setTransferTypeId(transferTypeId);
-            transferDao.createTransfer(newTransfer);
-        }
+        return newTransfer;
     }
-@GetMapping("/list/{username}")
-    public List<Transfer> getTransferList (@PathVariable String username){
-        List<Transfer> transferList = transferDao.getListOfTransfers(username);
+
+    @GetMapping("/transfer/view-all")
+    public List<Transfer> getTransferList(Principal principal) {
+        List<Transfer> transferList = transferDao.getListOfTransfers(principal.getName());
         return transferList;
+    }
+
+    @GetMapping("/transfer/detail/{transferId}")
+    public Transfer getTransferDetails(@PathVariable int transferId, Principal principal){
+        Transfer searchTransfer = transferDao.getTransferDetails(transferId);
+        return searchTransfer;
     }
 }

@@ -17,9 +17,11 @@ import java.util.List;
 public class JdbcUserDao implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    private AccountDao accountDao;
 
-    public JdbcUserDao(JdbcTemplate jdbcTemplate) {
+    public JdbcUserDao(JdbcTemplate jdbcTemplate, AccountDao accountDao) {
         this.jdbcTemplate = jdbcTemplate;
+        this.accountDao = accountDao;
     }
 
     @Override
@@ -57,26 +59,18 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public boolean create(String username, String password) {
-
-        // create user
-        boolean isCreated = false;
+        boolean isUserCreated = false;
         String sql = "INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(password);
-        String query = "Insert INTO account(user_id, balance) values(?,?);";
         Integer newUserId;
         try {
             newUserId = jdbcTemplate.queryForObject(sql, Integer.class, username, password_hash);
-            Account userAccount = new Account();
-            jdbcTemplate.update(query, newUserId, userAccount.getBalance());
-
-            isCreated = true;
+            accountDao.createAccount(newUserId);
+            isUserCreated = true;
         } catch (DataAccessException e) {
-            isCreated = false;
+            isUserCreated = false;
         }
-
-        // TODO: Create the account record with initial balance
-
-        return isCreated;
+        return isUserCreated;
     }
 
     private User mapRowToUser(SqlRowSet rs) {

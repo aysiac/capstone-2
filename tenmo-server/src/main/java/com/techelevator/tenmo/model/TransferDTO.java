@@ -1,28 +1,37 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 /**
  * DTO for passing the transfer info from client
  */
 public class TransferDTO {
-    private String  fromUserName;
-    private String  toUserName;
+    @NotNull(message = "fromUserId should not empty.")
+    private int fromUserId;
+    @NotNull(message = "toUserId should not empty.")
+    private int toUserId;
+    @NotNull(message = "amount should not empty.")
+    @Min(value = 1)
     private double amount;
+    @NotEmpty(message = "transferType should not empty.")
     private String transferType;
 
-    public String getFromUserName() {
-        return fromUserName;
+    public int getFromUserId() {
+        return fromUserId;
     }
 
-    public void setFromUserName(String fromUserName) {
-        this.fromUserName = fromUserName;
+    public void setFromUserId(int fromUserName) {
+        this.fromUserId = fromUserName;
     }
 
-    public String getToUserName() {
-        return toUserName;
+    public int getToUserId() {
+        return toUserId;
     }
 
-    public void setToUserName(String toUserName) {
-        this.toUserName = toUserName;
+    public void setToUserId(int toUserName) {
+        this.toUserId = toUserName;
     }
 
     public double getAmount() {

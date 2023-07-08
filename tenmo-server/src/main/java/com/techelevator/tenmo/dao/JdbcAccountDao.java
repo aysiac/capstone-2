@@ -18,7 +18,7 @@ public class JdbcAccountDao implements AccountDao{
         Account userAccount = null;
         String query = "SELECT account_id, user_id, balance FROM account WHERE user_id =?;";
        try{
-           SqlRowSet results = jdbcTemplate.queryForRowSet(query,Account.class,userId);
+           SqlRowSet results = jdbcTemplate.queryForRowSet(query, userId);
            if(results.next()){
                userAccount = mapToAccount(results);
            }

@@ -15,7 +15,7 @@ public class TransferDTO {
     @NotNull(message = "amount should not empty.")
     @Min(value = 1)
     private double amount;
-    @NotEmpty(message = "transferType should not empty.")
+    @NotNull(message = "transferType should not empty.")
     private String transferType;
 
     public int getFromUserId() {

@@ -8,9 +8,7 @@ import javax.validation.constraints.NotEmpty;
  * DTO for storing account balance
  */
 public class AccountBalanceDTO {
-    @NotEmpty
     private double balance;
-
 
     public double getBalance() {
         return balance;

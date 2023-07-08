@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/")
+//@RequestMapping("/users")
 public class UserController {
 
     private UserDao userDao;
@@ -17,23 +17,23 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    @GetMapping()
+    @GetMapping("/users")
     public List<User> getUsers() {
-        List<User> userList = new ArrayList<>();
+        List<User> userList = null;
         userList = userDao.findAll();
         return userList;
     }
 
-    @GetMapping("{username}")
-    public User getUserByUserName(@PathVariable String username){
+    @GetMapping("/view-user/{username}")
+    public User getUserByUserName(@PathVariable String username) {
         User searchedUser = null;
         searchedUser = userDao.findByUsername(username);
         return searchedUser;
     }
 
-    @GetMapping("name/{name}")
-    public int getUserId(@PathVariable String name){
-        int userId ;
+    @GetMapping("/user/view-id/{name}")
+    public int getUserId(@PathVariable String name) {
+        int userId;
         userId = userDao.findIdByUsername(name);
         return userId;
     }

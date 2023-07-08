@@ -1,15 +1,20 @@
 package com.techelevator.tenmo.model;
 
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+
 public class Account {
     private int accountId;
+    @Min(value = 0)
     private double balance = 100.00 ;
-
     private int userId;
 
     public int getAccountId(){
         return accountId;
     }
+
     public void setAccountId(int accountId){
         this.accountId = accountId;
     }

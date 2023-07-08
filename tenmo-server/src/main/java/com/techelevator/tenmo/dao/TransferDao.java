@@ -16,5 +16,6 @@ public interface TransferDao {
     public Transfer getTransferDetails(int transferId);
     public int getStatusByName(String statusName);
     public int getTransferType(String typeName);
-    public List<Transfer> getListOfPendingTransfer();
+    public List<Transfer> getListOfPendingTransfer(int fromUserId);
+    public Transfer actionRequest(int transferId,String statusName);
 }

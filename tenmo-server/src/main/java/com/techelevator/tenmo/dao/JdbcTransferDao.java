@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,25 +130,41 @@ public class JdbcTransferDao implements TransferDao {
         }
         return typeId;
     }
-    public List<Transfer> getListOfPendingTransfer(){
-        List<Transfer> pendingList = null;
+    public List<Transfer> getListOfPendingTransfer(int userAccountId){
+        List<Transfer> pendingList = new ArrayList<>();
 
-        String query = "SELECT transfer_id, from_account, transfer_amount FROM transfer " +
-                "WHERE transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_name =?);";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(query,"Pending");
+        String query = "SELECT transfer_id, transfer_type_id, transfer_status_id,from_account,to_account, transfer_amount FROM transfer " +
+                "WHERE transfer_status_id = (SELECT transfer_status_id FROM transfer_status " +
+                "WHERE transfer_status_name =?) AND to_account = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query,"Pending", userAccountId);
 
         while (results.next()){
-            Transfer transfer = new Transfer();
-            transfer.setTransferTypeId(results.getInt("transfer_id"));
-            transfer.setFromAccount(results.getInt("from_account"));
-            transfer.setTransferAmount(results.getDouble("transfer_amount"));
-
+            Transfer transfer =  mapToTransfer(results);
             pendingList.add(transfer);
         }
         return pendingList;
-
     }
 
+    public Transfer actionRequest(int transferId,String actionName)
+    {
+        int transferStatusId;
+        Transfer updatedTransfer = null;
+        String query = "SELECT transfer_status_id FROM transfer_status WHERE transfer_status_name =?;";
+        transferStatusId = jdbcTemplate.queryForObject(query, Integer.class, actionName);
+        String updateQuery = "UPDATE transfer SET transfer_status_id =? WHERE transfer_id =?;";
+        jdbcTemplate.update(updateQuery,transferStatusId, transferId);
+
+        String selectQuery = "SELECT transfer_id,transfer_type_id,transfer_status_id,from_account,to_account,transfer_amount WHERE transfer_id =?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(selectQuery, transferId);
+        if(results.next()){
+            updatedTransfer = mapToTransfer(results);
+        }
+
+        if(actionName.equals("Approved") ){
+            makeTransfer(updatedTransfer.getFromAccount(),updatedTransfer.getToAccount(),updatedTransfer.getTransferAmount());
+        }
+        return updatedTransfer;
+    }
 
     private User mapToUser(SqlRowSet rowSet) {
         User user = new User();

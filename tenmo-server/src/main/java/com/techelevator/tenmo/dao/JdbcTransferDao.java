@@ -130,12 +130,8 @@ public class JdbcTransferDao implements TransferDao {
         return typeId;
     }
 
-<<<<<<< HEAD
 
-    private User mapToUser(SqlRowSet rowSet){
-=======
     private User mapToUser(SqlRowSet rowSet) {
->>>>>>> e44f9c42035926ad55f2e0497313144e27a3ba88
         User user = new User();
         user.setId(rowSet.getLong("user_id"));
         user.setUsername(rowSet.getString("username"));

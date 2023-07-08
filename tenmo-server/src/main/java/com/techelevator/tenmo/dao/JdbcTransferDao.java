@@ -129,6 +129,24 @@ public class JdbcTransferDao implements TransferDao {
         }
         return typeId;
     }
+    public List<Transfer> getListOfPendingTransfer(){
+        List<Transfer> pendingList = null;
+
+        String query = "SELECT transfer_id, from_account, transfer_amount FROM transfer " +
+                "WHERE transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_name =?);";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query,"Pending");
+
+        while (results.next()){
+            Transfer transfer = new Transfer();
+            transfer.setTransferTypeId(results.getInt("transfer_id"));
+            transfer.setFromAccount(results.getInt("from_account"));
+            transfer.setTransferAmount(results.getDouble("transfer_amount"));
+
+            pendingList.add(transfer);
+        }
+        return pendingList;
+
+    }
 
 
     private User mapToUser(SqlRowSet rowSet) {

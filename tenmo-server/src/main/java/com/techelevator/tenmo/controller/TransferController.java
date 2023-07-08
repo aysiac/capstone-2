@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @PreAuthorize("isAuthenticated()")
@@ -43,7 +44,7 @@ public class TransferController {
     public Transfer makeTransfer(@Valid @RequestBody TransferDTO transferDTO, Principal principal) {
         boolean isTransferSuccess;
         Transfer newTransfer = null;
-        if(transferDTO.getFromUserId() != transferDTO.getToUserId()) {
+        if (transferDTO.getFromUserId() != transferDTO.getToUserId()) {
             Account fromAccount = accountDao.getAccountByUserId(transferDTO.getFromUserId());
             Account toAccount = accountDao.getAccountByUserId(transferDTO.getToUserId());
             int loggedInUserId = userDao.findIdByUsername(principal.getName());
@@ -54,11 +55,11 @@ public class TransferController {
                     transferDao.makeTransfer(fromAccount.getAccountId(), toAccount.getAccountId(), transferDTO.getAmount());
                     isTransferSuccess = true;
                 } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST," Insufficient balance.");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " Insufficient balance.");
                 }
                 if (isTransferSuccess) {
-                    newTransfer = setTransfer("Approved","Sent", fromAccount.getAccountId(),
-                            toAccount.getAccountId(),transferDTO.getAmount());
+                    newTransfer = setTransfer("Approved", "Sent", fromAccount.getAccountId(),
+                            toAccount.getAccountId(), transferDTO.getAmount());
 //                    int statusId = transferDao.getStatusByName("Approved");
 //                    int transferTypeId = transferDao.getTransferType("Sent");
 //                    Transfer transfer = new Transfer();
@@ -70,16 +71,14 @@ public class TransferController {
 //
 //                    newTransfer = transferDao.createTransfer(transfer);
                 }
-            }
-            else
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not authorized to make a transfer.");
-        }
-        else
+            } else
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not authorized to make a transfer.");
+        } else
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromAccount and toAccount cannot be the same. Choose a different toAccount.");
         return newTransfer;
     }
 
-    private Transfer setTransfer(String statusName, String transferType, int fromAccountId, int toAccountId,double amount){
+    private Transfer setTransfer(String statusName, String transferType, int fromAccountId, int toAccountId, double amount) {
         Transfer newTransfer = null;
         int statusId = transferDao.getStatusByName(statusName);
         int transferTypeId = transferDao.getTransferType(transferType);
@@ -94,6 +93,7 @@ public class TransferController {
 
         return newTransfer;
     }
+
     @GetMapping("/transfer/view-all")
     public List<Transfer> getTransferList(Principal principal) {
         List<Transfer> transferList = transferDao.getListOfTransfers(principal.getName());
@@ -101,8 +101,25 @@ public class TransferController {
     }
 
     @GetMapping("/transfer/detail/{transferId}")
-    public Transfer getTransferDetails(@PathVariable int transferId, Principal principal){
+    public Transfer getTransferDetails(@PathVariable int transferId, Principal principal) {
         Transfer searchTransfer = transferDao.getTransferDetails(transferId);
         return searchTransfer;
+    }
+@PostMapping("/request-transfer")
+    public Transfer requestTransfer(TransferDTO transferDto ,Principal principal) {
+
+        Account fromAccount = accountDao.getAccountByUserId(transferDto.getFromUserId());
+        Account toAccount = accountDao.getAccountByUserId(transferDto.getToUserId());
+       Transfer requestTransfer= setTransfer("Pending", transferDto.getTransferType(), fromAccount.getAccountId(), toAccount.getAccountId(), transferDto.getAmount());
+
+        return requestTransfer;
+
+    }
+    @GetMapping("/pending-request")
+    public List<Transfer> pendingRequest(Principal principal){
+        List<Transfer> pendingRequest = new ArrayList<>();
+        pendingRequest = transferDao.getListOfPendingTransfer();
+
+        return pendingRequest;
     }
 }

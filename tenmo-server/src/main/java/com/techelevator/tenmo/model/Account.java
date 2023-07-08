@@ -7,8 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 public class Account {
     private int accountId;
-    @Min(value = 0)
-    private double balance = 100.00 ;
+    private double balance = 1000.00 ;
     private int userId;
 
     public int getAccountId(){

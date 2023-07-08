@@ -62,29 +62,5 @@ public class TransferController {
         return transferList;
     }
 
-    private Transfer setTransfer(String statusName, String transferType, int fromAccountId, int toAccountId,double amount){
-        Transfer newTransfer = null;
-        int statusId = transferDao.getStatusByName(statusName);
-        int transferTypeId = transferDao.getTransferType(transferType);
-        Transfer transfer = new Transfer();
-        transfer.setFromAccount(fromAccountId);
-        transfer.setToAccount(toAccountId);
-        transfer.setTransferAmount(amount);
-        transfer.setTransferStatusId(statusId);
-        transfer.setTransferTypeId(transferTypeId);
-
-        transferDao.createTransfer(transfer);
-
-        return newTransfer;
-    }
-
-    public Transfer requestTransfer(TransferDTO transferDto){
-        Transfer requestTransfer = new Transfer();
-
-        Transfer newTransfer = setTransfer("Pending", "Requested", transferDTO.get);
-
-
-
-    }
 
 }

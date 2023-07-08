@@ -130,13 +130,6 @@ public class JdbcTransferDao  implements TransferDao{
         return typeId;
     }
 
-    //public int requestTransfer(Transfer requestTrasnfer){
-   // String query = "SELECT transfer_amount " +
-       //     "FROM transfer Where  ";
-    //    if(
-
-     //   )
-   // }
 
     private User mapToUser(SqlRowSet rowSet){
         User user = new User();

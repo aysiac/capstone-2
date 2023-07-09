@@ -154,7 +154,8 @@ public class JdbcTransferDao implements TransferDao {
         String updateQuery = "UPDATE transfer SET transfer_status_id =? WHERE transfer_id =?;";
         jdbcTemplate.update(updateQuery,transferStatusId, transferId);
 
-        String selectQuery = "SELECT transfer_id,transfer_type_id,transfer_status_id,from_account,to_account,transfer_amount WHERE transfer_id =?;";
+        String selectQuery = "SELECT transfer_id,transfer_type_id,transfer_status_id,from_account,to_account,transfer_amount" +
+                " FROM transfer WHERE transfer_id =?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(selectQuery, transferId);
         if(results.next()){
             updatedTransfer = mapToTransfer(results);

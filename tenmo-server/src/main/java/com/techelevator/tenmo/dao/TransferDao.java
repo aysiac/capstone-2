@@ -13,7 +13,7 @@ public interface TransferDao {
     public void makeTransfer(int fromAccountId, int toAccountId, double amount);
     public Transfer createTransfer(Transfer newTransfer);
     public List<Transfer> getListOfTransfers(String username);
-    public Transfer getTransferDetails(int transferId);
+    public Transfer getTransferDetails(int transferId, int userAccountId);
     public int getStatusByName(String statusName);
     public int getTransferType(String typeName);
     public List<Transfer> getListOfPendingTransfer(int fromUserId);

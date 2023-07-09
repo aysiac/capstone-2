@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.model;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -15,7 +16,8 @@ public class TransferDTO {
     @NotNull(message = "amount should not empty.")
     @Min(value = 1)
     private double amount;
-    @NotNull(message = "transferType should not empty.")
+    @NotEmpty(message = "transferType should not empty.")
+    @NotBlank(message = "transferType should not empty.")
     private String transferType;
 
     public int getFromUserId() {

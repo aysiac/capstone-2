@@ -92,7 +92,8 @@ public class TransferController {
 
     @GetMapping("/transfer/detail/{transferId}")
     public Transfer getTransferDetails(@PathVariable int transferId, Principal principal) {
-        Transfer searchTransfer = transferDao.getTransferDetails(transferId);
+        Account logInUserAccount = accountDao.getAccountByUserName(principal.getName());
+        Transfer searchTransfer = transferDao.getTransferDetails(transferId, logInUserAccount.getAccountId());
         return searchTransfer;
     }
 
@@ -123,7 +124,7 @@ public class TransferController {
         return pendingRequest;
     }
     @PostMapping("/action-request")
-    public Transfer actionRequest(@RequestBody  ActionDTO actionDTO, Principal principal){
+    public Transfer actionRequest(@Valid @RequestBody  ActionDTO actionDTO, Principal principal){
         Transfer transfer = null;
         transfer = transferDao.actionRequest(actionDTO.getTransferId(), actionDTO.getActionName());
 

@@ -72,7 +72,7 @@ public class JdbcTransferDao implements TransferDao {
             transferId = jdbcTemplate.queryForObject(query, Integer.class, newTransfer.getTransferStatusId(),
                     newTransfer.getTransferTypeId(), newTransfer.getFromAccount(), newTransfer.getToAccount(),
                     newTransfer.getTransferAmount());
-            transfer = getTransferDetails(transferId);
+            transfer = getTransferDetails(transferId,newTransfer.getFromAccount());
         } catch (DataAccessException ex) {
             //TODO
         }
@@ -81,11 +81,17 @@ public class JdbcTransferDao implements TransferDao {
 
     public List<Transfer> getListOfTransfers(String username) {
         List<Transfer> transferList = new ArrayList<>();
-        String sql = "SELECT transfer_id, transfer_status_id, transfer_type_id, from_account, to_account, transfer_amount FROM transfer " +
-                "WHERE from_account = (SELECT account_id FROM account WHERE user_id = " +
-                "(SELECT user_id FROM tenmo_user WHERE username =?));";
+       int userAccountId ;
+        String query = "SELECT account_id FROM account WHERE user_id = " +
+                "(SELECT user_id FROM tenmo_user WHERE username =?)";
+
+        String sql = "SELECT transfer_id, transfer_status_id, transfer_type_id, from_account, to_account, " +
+                "transfer_amount FROM transfer WHERE (from_account =? OR to_account =?);";
+
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
+            userAccountId =jdbcTemplate.queryForObject(query, Integer.class,username);
+
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userAccountId,userAccountId);
             while (results.next()) {
                 Transfer transfer = mapToTransfer(results);
                 transferList.add(transfer);
@@ -96,12 +102,12 @@ public class JdbcTransferDao implements TransferDao {
         return transferList;
     }
 
-    public Transfer getTransferDetails(int transferId) {
+    public Transfer getTransferDetails(int transferId, int userAccountId) {
         Transfer transfer = null;
         String sql = "SELECT transfer_id, transfer_status_id, transfer_type_id, from_account, to_account, transfer_amount" +
-                " FROM transfer WHERE transfer_id =?;";
+                " FROM transfer WHERE transfer_id =? AND (from_account =? OR to_account =?);";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferId);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferId,userAccountId,userAccountId);
             if (results.next()) {
                 transfer = mapToTransfer(results);
             }
@@ -162,7 +168,7 @@ public class JdbcTransferDao implements TransferDao {
         }
 
         if(actionName.equals("Approved") ){
-            makeTransfer(updatedTransfer.getFromAccount(),updatedTransfer.getToAccount(),updatedTransfer.getTransferAmount());
+            makeTransfer(updatedTransfer.getToAccount(),updatedTransfer.getFromAccount(),updatedTransfer.getTransferAmount());
         }
         return updatedTransfer;
     }
